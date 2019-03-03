@@ -22,6 +22,8 @@ check_status_notify() {
     #@--- Output a red-blinking error of the specific package installation failure ---@#
     #@--- Red ---@#
     echo -e "\033[31m ************* An error occured when trying to install ${package}.a Check the error above ****************"
+    #@--- Break out of deploy sequence, Installation error should not proceed to run rest of process ---@#
+    #@--- due to the error ---@#
     exit 1
 }
 
@@ -140,7 +142,7 @@ start_the_application() {
     forever list
 }
 
-#@--- fucntion to run the sequence and start th app---@#
+#@--- Fucntion to run the sequence and start th app ---@#
 run_deploy_sequence() {
     package_installations
     configure_nginx

@@ -1,4 +1,4 @@
-### A script to deploy: https://github.com/andela/ah-code-titans-frontend.git to an EC2 instance.
+####  A script to deploy: https://github.com/andela/ah-code-titans-frontend.git to an EC2 instance.
 
 ### Enter the values for the keys in sample.env and rename sample.env to .env before running the script
 
@@ -13,3 +13,5 @@
  - Specify that bash is to run the script:
   ` bash deploy_aws_ec2.sh`
 
+
+#### Link to application: https://authors-haven.ga
