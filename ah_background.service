@@ -4,9 +4,9 @@ After=network.target
 
 [Service]
 Type=simple
-User=vagrant
-WorkingDirectory=/home/vagrant
-ExecStart=/bin/bash /home/vagrant/start_ah.sh
+User=ubuntu
+WorkingDirectory=/home/ubuntu
+ExecStart=/bin/bash /home/ubuntu/start_ah.sh
 
 [Install]
 WantedBy=multi-user.target

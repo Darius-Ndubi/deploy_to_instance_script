@@ -142,8 +142,8 @@ build_the_application() {
 }
 #@--- fucntion to create a startfile ---@#
 application_start_file() {
-    touch /home/vagrant/start_ah.sh && chmod u+x /home/vagrant/start_ah.sh
-    echo "serve -s build" | tee /home/vagrant/start_ah.sh
+    touch /home/ubuntu/start_ah.sh && chmod u+x /home/ubuntu/start_ah.sh
+    echo "serve -s build" | tee /home/ubuntu/start_ah.sh
 }
 
 #@--- Fucntion to start the application as a service---@#
