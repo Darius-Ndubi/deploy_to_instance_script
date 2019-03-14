@@ -104,10 +104,10 @@ configure_service() {
 
 #@--- Function to clone the applications code from the repo ---@#
 avail_the_code() {
-    #@--- If the directory already exists, delete it ---@#
+    #@--- If the build directory already exists, delete it ---@#
     #@--- Clone the repo again and cd into ah-code-titans-frontend directory ---@#
-    if [ -d "ah-code-titans-frontend/" ]; then
-        sudo rm -rf ah-code-titans-frontend/
+    if [ -d "build/" ]; then
+        sudo rm -rf build/
         git clone $GIT_REPOSITORY
         cd ah-code-titans-frontend/
 
@@ -132,12 +132,18 @@ build_the_application() {
     npm i
     #@--- Build the application ---@#
     npm run build
-    # destroy the files
+    #@--- move the builded application  one directory back ---@#
+    mv build ../
+    #@--- Move back one directory---@#
+    cd ..
+    #@--- Delete the folder holding the application ---@#
+    rm -rf ah-code-titans-frontend/
+
 }
 #@--- fucntion to create a startfile ---@#
 application_start_file() {
-    touch /home/ubuntu/ah-code-titans-frontend/start_ah.sh && chmod u+x /home/ubuntu/ah-code-titans-frontend/start_ah.sh
-    echo "serve -s build" | tee /home/ubuntu/ah-code-titans-frontend/start_ah.sh
+    touch /home/vagrant/start_ah.sh && chmod u+x /home/vagrant/start_ah.sh
+    echo "serve -s build" | tee /home/vagrant/start_ah.sh
 }
 
 #@--- Fucntion to start the application as a service---@#

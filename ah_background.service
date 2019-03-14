@@ -4,9 +4,9 @@ After=network.target
 
 [Service]
 Type=simple
-User=ubuntu
-WorkingDirectory=/home/ubuntu/ah-code-titans-frontend
-ExecStart=/bin/bash /home/ubuntu/ah-code-titans-frontend/start_ah.sh
+User=vagrant
+WorkingDirectory=/home/vagrant
+ExecStart=/bin/bash /home/vagrant/start_ah.sh
 
 [Install]
 WantedBy=multi-user.target
