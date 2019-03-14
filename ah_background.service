@@ -1,0 +1,12 @@
+[Unit]
+Description=Authors haven service
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/ah-code-titans-frontend
+ExecStart=/bin/bash /home/ubuntu/ah-code-titans-frontend/start_ah.sh
+
+[Install]
+WantedBy=multi-user.target

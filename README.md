@@ -1,6 +1,7 @@
 ####  A script to deploy: https://github.com/andela/ah-code-titans-frontend.git to an EC2 instance.
 
 ### Enter the values for the keys in sample.env and rename sample.env to .env before running the script
+Edit the ah-frontend.conf with your domains in place of mine
 
 ### To run deploy script:
 #### Method 1

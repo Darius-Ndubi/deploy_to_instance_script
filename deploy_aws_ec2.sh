@@ -3,17 +3,6 @@
 #@---  Load environment variables to be used---@#
 source .env
 
-#@---  nginx config ---@#
-primary_configuration="
-server {
-    listen 80;
-    server_name $DOMAIN_NAME  www.$DOMAIN_NAME;
-
-    location / {
-        proxy_pass 'http://127.0.0.1:3000';
-    }
-}
-"
 
 check_status_notify() {
     #@--- Set the argument passed ---@#
@@ -32,7 +21,7 @@ check_status_notify() {
 package_installations() {
     sudo add-apt-repository ppa:certbot/certbot -y
     apt-get update
-    curl -sL https://deb.nodesource.com/setup_10.x | sudo bash -
+    curl -sL https://deb.nodesource.com/setup_11.x | sudo bash -
     install_node="sudo apt-get install nodejs -y"
     eval ${install_node}
     #@--- If the installation task was not successfull, return 1 and break---@#
@@ -55,11 +44,11 @@ package_installations() {
             if [ $? -gt 0 ]; then
                 check_status_notify "certbot"
             else
-                #@--- Forever installation, runs the application in the background---@#
-                install_forever="sudo npm install forever -g"
-                eval ${install_forever}
+                #@--- Serve installation, runs the builded version of the application--@#
+                install_serve="sudo npm install serve -g"
+                eval ${install_serve}
                 if [ $? -gt 0 ]; then
-                    check_status_notify "forever"
+                    check_status_notify "serve"
                 fi
             fi
         fi
@@ -78,17 +67,16 @@ configure_nginx() {
         #@--- delete the default nginx configuration ---@#
         if [[ -e /etc/nginx/sites-enabled/default ]]; then
             sudo rm /etc/nginx/sites-enabled/default
+            sudo rm /etc/nginx/sites-available/default
         fi
         echo -e "\033[31m ************* Removed the default config **************** "
-        #@--- Create config file for our service ---@#
-        sudo touch /etc/nginx/sites-enabled/ah-frontend
-        echo -e "\033[32m ************* Created new config file ****************"
 
-        #@--- Add nginx config to the file ---@#
-        echo ${primary_configuration} | sudo tee /etc/nginx/sites-enabled/ah-frontend
+        #@--- Copy config file for our service ---@#
+        echo -e "\033[32m ************* Copied new config file ****************"
+        sudo cp ah-frontend.conf /etc/nginx/sites-enabled/ah-frontend
 
         #@--- Link to sites available ---@#
-        sudo ln -s /etc/nginx/sites-enabled/ah-frontend /etc/nginx/sites-available/ah-frontend
+        sudo ln -s /etc/nginx/sites-enabled/ah-frontend.conf /etc/nginx/sites-available/default
 
         #@--- restart nginx ---@#
         sudo /etc/init.d/nginx restart
@@ -108,12 +96,18 @@ configure_ssl () {
     sudo /etc/init.d/nginx restart
 }
 
+#@--- Fucntion to copy file to configure the application to be run as---@#
+#@--- UNIX service in the background ---@#
+configure_service() {
+    sudo cp ah_background.service /lib/systemd/system/ah_background.service
+}
+
 #@--- Function to clone the applications code from the repo ---@#
 avail_the_code() {
     #@--- If the directory already exists, delete it ---@#
     #@--- Clone the repo again and cd into ah-code-titans-frontend directory ---@#
     if [ -d "ah-code-titans-frontend/" ]; then
-        rm -rf ah-code-titans-frontend/
+        sudo rm -rf ah-code-titans-frontend/
         git clone $GIT_REPOSITORY
         cd ah-code-titans-frontend/
 
@@ -125,31 +119,48 @@ avail_the_code() {
 }
 
 
-start_the_application() {
+build_the_application() {
     #@--- Export route to the backend ---@#
     export REACT_APP_API=$REACT_API_LINK
 
     #@--- Blue ---@#
-    echo -e "\033[34m --------------------Starting up.......-----------------"
+    echo -e "\033[34m --------------------Building ..........-----------------"
 
-    #@--- Start the application ---@#
+    #@--- Grant the current user priviledges to npm folder ---@#
+    sudo chown -R `whoami` ~/.npm
+    #@--- Install dependencies---@#
     npm i
-
-    #@--- Ininitate runnung the application in the background ---@#
-    forever start -c "npm run start-js" .
-
-    #@--- Check if the application is successfully running in the background---@#
-    forever list
+    #@--- Build the application ---@#
+    npm run build
+    # destroy the files
 }
+#@--- fucntion to create a startfile ---@#
+application_start_file() {
+    touch /home/ubuntu/ah-code-titans-frontend/start_ah.sh && chmod u+x /home/ubuntu/ah-code-titans-frontend/start_ah.sh
+    echo "serve -s build" | tee /home/ubuntu/ah-code-titans-frontend/start_ah.sh
+}
+
+#@--- Fucntion to start the application as a service---@#
+start_application_service() {
+    #@--- Reload the deamon ---@#
+    sudo systemctl daemon-reload
+    #@---Start the service just created ---@#
+    sudo systemctl restart ah_background
+    #@--- Enable the service so that it can be ran on boot ---@#
+    sudo systemctl enable ah_background
+}
+
 
 #@--- Fucntion to run the sequence and start th app ---@#
 run_deploy_sequence() {
     package_installations
     configure_nginx
     configure_ssl
+    configure_service
     avail_the_code
-    start_the_application
-
+    build_the_application
+    application_start_file
+    start_application_service
 }
 
 #@--- Run the whole script ---@#
