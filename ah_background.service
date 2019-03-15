@@ -5,8 +5,8 @@ After=network.target
 [Service]
 Type=simple
 User=ubuntu
-WorkingDirectory=/home/ubuntu
-ExecStart=/bin/bash /home/ubuntu/start_ah.sh
+WorkingDirectory=/home/ubuntu/deploy_to_instance_script
+ExecStart=/bin/bash /home/ubuntu/deploy_to_instance_script/start_ah.sh
 
 [Install]
 WantedBy=multi-user.target
